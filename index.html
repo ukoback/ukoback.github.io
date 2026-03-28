@@ -1,311 +1,893 @@
 export default {
-async fetch(request) {
+  async fetch(request) {
 
-const html = `
-<!DOCTYPE html>
+    const html = `<!DOCTYPE html>
 <html lang="es">
-
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>UKOBACK</title>
+<title>UKOBACK — Poeta · Youtuber</title>
+<meta name="description" content="Ukoback — Youtuber chileno, poeta y creador de contenido. Espacio digital oficial.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Crimson+Pro:ital,wght@0,300;0,400;1,300;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 
 <style>
-
-/* RESET */
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
+/* ── RESET ─────────────────────────────────────────── */
+*, *::before, *::after {
+  margin: 0; padding: 0;
+  box-sizing: border-box;
 }
 
-/* BASE */
-body{
-background:#050505;
-color:white;
-font-family:system-ui;
-overflow-x:hidden;
+/* ── VARIABLES ──────────────────────────────────────── */
+:root {
+  --ink: #0a0806;
+  --paper: #f5f0e8;
+  --cream: #ede6d6;
+  --gold: #c9a84c;
+  --gold-dim: #7a6228;
+  --rust: #8b3a2a;
+  --white: #faf7f2;
+  --font-display: 'Bebas Neue', sans-serif;
+  --font-body: 'Crimson Pro', serif;
+  --font-mono: 'Space Mono', monospace;
 }
 
-/* HERO */
-.hero{
-height:100vh;
-position:relative;
-display:flex;
-flex-direction:column;
-align-items:center;
-justify-content:center;
-text-align:center;
-padding:20px;
+/* ── BASE ───────────────────────────────────────────── */
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--ink);
+  color: var(--white);
+  font-family: var(--font-body);
+  overflow-x: hidden;
+  cursor: none;
 }
 
-/* VIDEO FONDO */
-.hero iframe{
-position:absolute;
-top:50%;
-left:50%;
-width:177.77vh;
-height:100vh;
-transform:translate(-50%,-50%);
-z-index:-3;
-pointer-events:none;
+/* ── CURSOR CUSTOM ──────────────────────────────────── */
+.cursor {
+  position: fixed;
+  top: 0; left: 0;
+  width: 10px; height: 10px;
+  background: var(--gold);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+  transition: transform 0.08s ease, width 0.2s, height 0.2s, background 0.2s;
+  mix-blend-mode: difference;
 }
 
-/* OVERLAY */
-.overlay{
-position:absolute;
-width:100%;
-height:100%;
-background:rgba(0,0,0,0.75);
-z-index:-2;
+.cursor-ring {
+  position: fixed;
+  top: 0; left: 0;
+  width: 36px; height: 36px;
+  border: 1px solid rgba(201,168,76,0.5);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9998;
+  transform: translate(-50%, -50%);
+  transition: transform 0.18s ease;
 }
 
-/* TITULO */
-.title{
-font-size:clamp(40px, 10vw, 140px);
-font-weight:900;
-letter-spacing:clamp(5px, 2vw, 15px);
-text-shadow:0 0 20px black,0 0 40px black;
-animation:fade 2s;
+body:hover .cursor { opacity: 1; }
+
+/* ── NOISE OVERLAY ──────────────────────────────────── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  opacity: 0.03;
+  pointer-events: none;
+  z-index: 100;
 }
 
-/* SUBTITULO */
-.subtitle{
-font-size:clamp(14px, 2.5vw, 26px);
-letter-spacing:clamp(2px, 1vw, 5px);
-margin-top:15px;
-opacity:0.9;
+/* ── NAV ────────────────────────────────────────────── */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 500;
+  padding: 24px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(to bottom, rgba(10,8,6,0.9), transparent);
 }
 
-/* PERFIL */
-.profile{
-margin-top:30px;
+.nav-logo {
+  font-family: var(--font-display);
+  font-size: 22px;
+  letter-spacing: 6px;
+  color: var(--gold);
+  text-decoration: none;
 }
 
-.profile img{
-width:clamp(120px, 25vw, 180px);
-height:clamp(120px, 25vw, 180px);
-border-radius:50%;
-border:4px solid #111;
-box-shadow:0 0 30px rgba(0,0,0,0.9);
-transition:0.4s;
+.nav-links {
+  display: flex;
+  gap: 36px;
+  list-style: none;
 }
 
-.profile img:hover{
-transform:scale(1.1);
+.nav-links a {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: rgba(250,247,242,0.5);
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: color 0.3s;
 }
 
-/* BANNER */
-.banner{
-width:100%;
-height:auto;
-max-height:400px;
-object-fit:cover;
+.nav-links a:hover { color: var(--gold); }
+
+/* ── HERO ───────────────────────────────────────────── */
+.hero {
+  position: relative;
+  height: 100vh;
+  min-height: 600px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
 }
 
-/* SECCIONES */
-.section{
-padding:clamp(60px, 10vw, 120px) 20px;
-text-align:center;
+/* video background */
+.hero-video-wrap {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
 }
 
-/* INFO */
-.info{
-background:#0c0c0c;
+.hero-video-wrap iframe {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 177.78vh;
+  min-width: 100%;
+  height: 100vh;
+  min-height: 56.25vw;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  border: none;
 }
 
-.info h2{
-font-size:clamp(28px, 5vw, 50px);
-margin-bottom:25px;
-letter-spacing:4px;
+/* overlays */
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    160deg,
+    rgba(10,8,6,0.85) 0%,
+    rgba(10,8,6,0.65) 50%,
+    rgba(10,8,6,0.9) 100%
+  );
+  z-index: 1;
 }
 
-.info p{
-max-width:700px;
-margin:auto;
-font-size:clamp(16px, 2.5vw, 20px);
-line-height:1.7;
-opacity:0.85;
+.hero-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 30%, rgba(10,8,6,0.7) 100%);
+  z-index: 2;
 }
 
-/* VIDEOS */
-.videos{
-background:#070707;
+/* content */
+.hero-content {
+  position: relative;
+  z-index: 10;
+  text-align: center;
+  padding: 20px;
 }
 
-/* GRID RESPONSIVE */
-.video-grid{
-display:grid;
-grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));
-gap:30px;
-margin-top:60px;
+.hero-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 6px;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  opacity: 0;
+  animation: fadeUp 1s 0.3s forwards;
 }
 
-/* TARJETA */
-.video-card{
-background:#111;
-padding:15px;
-border-radius:10px;
-box-shadow:0 0 30px rgba(0,0,0,0.8);
-transition:0.4s;
+.hero-title {
+  font-family: var(--font-display);
+  font-size: clamp(80px, 18vw, 200px);
+  line-height: 0.9;
+  letter-spacing: 8px;
+  color: var(--white);
+  text-shadow: 0 0 80px rgba(201,168,76,0.15);
+  opacity: 0;
+  animation: fadeUp 1s 0.6s forwards;
 }
 
-.video-card:hover{
-transform:translateY(-8px) scale(1.03);
+.hero-title span {
+  color: var(--gold);
 }
 
-/* VIDEO RESPONSIVE */
-.video-card iframe{
-width:100%;
-aspect-ratio:16/9;
-border:none;
-border-radius:6px;
+.hero-sub {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: clamp(16px, 2.5vw, 24px);
+  color: rgba(250,247,242,0.65);
+  margin-top: 16px;
+  letter-spacing: 2px;
+  opacity: 0;
+  animation: fadeUp 1s 0.9s forwards;
 }
 
-/* FOOTER */
-.footer{
-padding:clamp(40px, 8vw, 80px);
-background:black;
-font-size:clamp(14px, 2vw, 18px);
-opacity:0.6;
-text-align:center;
+/* profile */
+.hero-profile {
+  margin-top: 40px;
+  opacity: 0;
+  animation: fadeUp 1s 1.2s forwards;
 }
 
-/* ANIMACIONES */
-@keyframes fade{
-from{
-opacity:0;
-transform:scale(1.1);
-}
-to{
-opacity:1;
-transform:scale(1);
-}
+.hero-profile img {
+  width: clamp(90px, 15vw, 140px);
+  height: clamp(90px, 15vw, 140px);
+  border-radius: 50%;
+  border: 2px solid var(--gold-dim);
+  object-fit: cover;
+  box-shadow: 0 0 0 8px rgba(201,168,76,0.05), 0 20px 60px rgba(0,0,0,0.8);
+  transition: transform 0.5s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.5s;
 }
 
-/* SCROLL ANIMATION */
-.reveal{
-opacity:0;
-transform:translateY(60px);
-transition:1s;
+.hero-profile img:hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 0 12px rgba(201,168,76,0.1), 0 30px 80px rgba(0,0,0,0.9);
 }
 
-.reveal.active{
-opacity:1;
-transform:translateY(0);
+/* scroll hint */
+.scroll-hint {
+  position: absolute;
+  bottom: 36px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  opacity: 0;
+  animation: fadeIn 1s 2s forwards;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
 }
 
-/* MOBILE EXTRA */
-@media (max-width:600px){
-
-.hero{
-height:90vh;
+.scroll-hint span {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 3px;
+  color: rgba(250,247,242,0.3);
+  text-transform: uppercase;
 }
 
-.title{
-letter-spacing:3px;
+.scroll-line {
+  width: 1px;
+  height: 50px;
+  background: linear-gradient(to bottom, var(--gold-dim), transparent);
+  animation: scrollPulse 2s 2s infinite;
 }
 
-.subtitle{
-letter-spacing:1px;
+/* ── BANNER ─────────────────────────────────────────── */
+.banner-wrap {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  height: clamp(120px, 25vw, 320px);
 }
 
+.banner-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 30%;
+  display: block;
+  filter: brightness(0.7) contrast(1.1);
 }
 
+.banner-wrap::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(10,8,6,0.6) 0%, transparent 50%, rgba(10,8,6,0.6) 100%);
+}
+
+/* ── SECCIONES BASE ─────────────────────────────────── */
+.section {
+  padding: clamp(80px, 12vw, 140px) clamp(24px, 8vw, 120px);
+}
+
+.section-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 5px;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 16px;
+  display: block;
+}
+
+.section-title {
+  font-family: var(--font-display);
+  font-size: clamp(42px, 8vw, 90px);
+  letter-spacing: 4px;
+  line-height: 1;
+  color: var(--white);
+  margin-bottom: 40px;
+}
+
+/* ── BIO ────────────────────────────────────────────── */
+.bio {
+  background: var(--ink);
+  border-top: 1px solid rgba(201,168,76,0.12);
+}
+
+.bio-inner {
+  max-width: 1200px;
+  margin: auto;
+  display: grid;
+  grid-template-columns: 1fr 1.6fr;
+  gap: clamp(40px, 8vw, 100px);
+  align-items: center;
+}
+
+.bio-left {
+  position: relative;
+}
+
+.bio-photo-frame {
+  position: relative;
+  display: inline-block;
+}
+
+.bio-photo-frame::before {
+  content: '';
+  position: absolute;
+  inset: -12px;
+  border: 1px solid rgba(201,168,76,0.2);
+  border-radius: 4px;
+  transform: rotate(2deg);
+  transition: transform 0.4s;
+}
+
+.bio-photo-frame:hover::before {
+  transform: rotate(0deg);
+}
+
+.bio-photo-frame img {
+  width: 100%;
+  max-width: 360px;
+  border-radius: 4px;
+  display: block;
+  filter: grayscale(30%) contrast(1.1);
+  transition: filter 0.4s;
+}
+
+.bio-photo-frame:hover img {
+  filter: grayscale(0%) contrast(1.05);
+}
+
+.bio-right p {
+  font-size: clamp(17px, 2.2vw, 21px);
+  line-height: 1.85;
+  color: rgba(250,247,242,0.75);
+  margin-bottom: 28px;
+}
+
+.bio-right p em {
+  color: var(--gold);
+  font-style: italic;
+}
+
+.bio-stats {
+  display: flex;
+  gap: 40px;
+  margin-top: 44px;
+  padding-top: 36px;
+  border-top: 1px solid rgba(201,168,76,0.15);
+}
+
+.stat-num {
+  font-family: var(--font-display);
+  font-size: 42px;
+  color: var(--gold);
+  line-height: 1;
+  display: block;
+}
+
+.stat-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: rgba(250,247,242,0.4);
+  text-transform: uppercase;
+  margin-top: 6px;
+  display: block;
+}
+
+/* ── VIDEOS ─────────────────────────────────────────── */
+.videos {
+  background: #060504;
+  border-top: 1px solid rgba(201,168,76,0.08);
+}
+
+.videos-inner {
+  max-width: 1200px;
+  margin: auto;
+}
+
+.video-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+  margin-top: 16px;
+}
+
+.video-card {
+  position: relative;
+  background: #0f0d0b;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid rgba(201,168,76,0.08);
+  transition: border-color 0.4s, transform 0.4s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.4s;
+}
+
+.video-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(201,168,76,0.3);
+  box-shadow: 0 24px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(201,168,76,0.1);
+}
+
+.video-card iframe {
+  width: 100%;
+  aspect-ratio: 16/9;
+  border: none;
+  display: block;
+}
+
+.video-meta {
+  padding: 14px 16px 16px;
+}
+
+.video-meta span {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--gold-dim);
+  text-transform: uppercase;
+}
+
+/* ── QUOTE ──────────────────────────────────────────── */
+.quote-section {
+  padding: clamp(80px, 12vw, 140px) clamp(24px, 8vw, 120px);
+  background: var(--ink);
+  border-top: 1px solid rgba(201,168,76,0.08);
+  text-align: center;
+}
+
+.quote-mark {
+  font-family: var(--font-body);
+  font-size: 120px;
+  line-height: 0.5;
+  color: rgba(201,168,76,0.15);
+  margin-bottom: 20px;
+  display: block;
+}
+
+.quote-text {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: clamp(22px, 4vw, 38px);
+  line-height: 1.5;
+  max-width: 800px;
+  margin: 0 auto 24px;
+  color: var(--cream);
+}
+
+.quote-author {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 4px;
+  color: var(--gold-dim);
+  text-transform: uppercase;
+}
+
+/* ── LINKS / REDES ──────────────────────────────────── */
+.links-section {
+  padding: clamp(80px, 12vw, 140px) clamp(24px, 8vw, 120px);
+  background: #060504;
+  border-top: 1px solid rgba(201,168,76,0.08);
+  text-align: center;
+}
+
+.links-inner {
+  max-width: 640px;
+  margin: auto;
+}
+
+.links-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 48px;
+}
+
+.link-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 28px;
+  border: 1px solid rgba(201,168,76,0.2);
+  border-radius: 4px;
+  text-decoration: none;
+  color: var(--white);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  background: transparent;
+  transition: background 0.3s, border-color 0.3s, transform 0.3s, color 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+
+.link-btn::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 0;
+  background: var(--gold);
+  transition: width 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  z-index: 0;
+}
+
+.link-btn:hover::before { width: 100%; }
+
+.link-btn:hover {
+  color: var(--ink);
+  border-color: var(--gold);
+  transform: translateX(4px);
+}
+
+.link-btn span, .link-btn svg {
+  position: relative;
+  z-index: 1;
+}
+
+.link-icon {
+  width: 18px;
+  height: 18px;
+  opacity: 0.6;
+  transition: opacity 0.3s;
+}
+
+.link-btn:hover .link-icon { opacity: 1; }
+
+/* ── FOOTER ─────────────────────────────────────────── */
+footer {
+  padding: clamp(50px, 8vw, 80px) clamp(24px, 6vw, 80px);
+  background: #030302;
+  border-top: 1px solid rgba(201,168,76,0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  text-align: center;
+}
+
+.footer-logo {
+  font-family: var(--font-display);
+  font-size: 36px;
+  letter-spacing: 10px;
+  color: rgba(201,168,76,0.3);
+}
+
+.footer-copy {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: rgba(250,247,242,0.2);
+  text-transform: uppercase;
+}
+
+.footer-line {
+  width: 60px;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--gold-dim), transparent);
+}
+
+/* ── REVEAL ANIMATION ───────────────────────────────── */
+.reveal {
+  opacity: 0;
+  transform: translateY(50px);
+  transition: opacity 0.9s cubic-bezier(0.16,1,0.3,1), transform 0.9s cubic-bezier(0.16,1,0.3,1);
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* stagger children */
+.reveal-stagger > * {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.7s cubic-bezier(0.16,1,0.3,1), transform 0.7s cubic-bezier(0.16,1,0.3,1);
+}
+
+.reveal-stagger.visible > *:nth-child(1) { opacity:1; transform:none; transition-delay: 0s; }
+.reveal-stagger.visible > *:nth-child(2) { opacity:1; transform:none; transition-delay: 0.1s; }
+.reveal-stagger.visible > *:nth-child(3) { opacity:1; transform:none; transition-delay: 0.2s; }
+.reveal-stagger.visible > *:nth-child(4) { opacity:1; transform:none; transition-delay: 0.3s; }
+
+/* ── KEYFRAMES ──────────────────────────────────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes scrollPulse {
+  0%, 100% { opacity: 0.3; transform: scaleY(1); }
+  50%       { opacity: 1;   transform: scaleY(1.2); }
+}
+
+/* ── RESPONSIVE ─────────────────────────────────────── */
+@media (max-width: 900px) {
+  .bio-inner { grid-template-columns: 1fr; text-align: center; }
+  .bio-left { display: none; }
+  .bio-stats { justify-content: center; }
+  nav { padding: 20px 24px; }
+  .nav-links { gap: 20px; }
+}
+
+@media (max-width: 600px) {
+  .nav-links { display: none; }
+  .hero-title { letter-spacing: 4px; }
+  .bio-stats { flex-direction: column; gap: 24px; }
+}
 </style>
-
 </head>
 
 <body>
 
-<section class="hero">
+<!-- CURSOR -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
 
-<div class="overlay"></div>
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">UKOBACK</a>
+  <ul class="nav-links">
+    <li><a href="#bio">Sobre mí</a></li>
+    <li><a href="#videos">Videos</a></li>
+    <li><a href="#links">Redes</a></li>
+  </ul>
+</nav>
 
-<iframe loading="lazy"
-src="https://www.youtube.com/embed/-FeV22nsNhE?autoplay=1&mute=1&loop=1&playlist=-FeV22nsNhE">
-</iframe>
+<!-- HERO -->
+<section class="hero" id="hero">
+  <div class="hero-video-wrap">
+    <iframe
+      src="https://www.youtube.com/embed/-FeV22nsNhE?autoplay=1&mute=1&loop=1&playlist=-FeV22nsNhE&controls=0&disablekb=1&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3"
+      allow="autoplay; encrypted-media"
+      allowfullscreen
+      loading="lazy"
+      title="Background video"
+    ></iframe>
+  </div>
+  <div class="hero-overlay"></div>
+  <div class="hero-vignette"></div>
 
-<div class="title">UKOBACK</div>
-<div class="subtitle">Youtuber chileno · Poeta</div>
+  <div class="hero-content">
+    <p class="hero-eyebrow">Youtuber · Poeta · Chile</p>
+    <h1 class="hero-title">UKO<span>BACK</span></h1>
+    <p class="hero-sub">Creador de contenido — Poeta visual</p>
+    <div class="hero-profile">
+      <img
+        src="https://i.postimg.cc/ZWXTPRL3/channels4-profile.jpg"
+        alt="Foto de perfil Ukoback"
+        loading="lazy"
+      >
+    </div>
+  </div>
 
-<div class="profile">
-<img src="https://i.postimg.cc/ZWXTPRL3/channels4-profile.jpg">
-</div>
-
+  <div class="scroll-hint">
+    <span>Scroll</span>
+    <div class="scroll-line"></div>
+  </div>
 </section>
 
-<img class="banner"
-src="https://yt3.googleusercontent.com/AlRcHDeqbIPWSMVGYcnoAG2bnFYSbpnK1ychvvvLlQebPBGjBG3CxNX-hqwXeS_AODNVbTcoSZw=w1060-fcrop64=1,00005a57ffffa5a8-k-c0xffffffff-no-nd-rj">
-
-<section class="section info reveal">
-
-<h2>MI ESPACIO</h2>
-
-<p>
-Soy Ukoback, creador de contenido, poeta y youtuber chileno.
-Este sitio funciona como mi espacio digital donde puedes descubrir
-mis videos y proyectos creativos.
-</p>
-
-</section>
-
-<section class="section videos reveal">
-
-<h2>VIDEOS DESTACADOS</h2>
-
-<div class="video-grid">
-
-<div class="video-card">
-<iframe loading="lazy"
-src="https://www.youtube.com/embed/-FeV22nsNhE">
-</iframe>
+<!-- BANNER -->
+<div class="banner-wrap">
+  <img
+    src="https://yt3.googleusercontent.com/AlRcHDeqbIPWSMVGYcnoAG2bnFYSbpnK1ychvvvLlQebPBGjBG3CxNX-hqwXeS_AODNVbTcoSZw=w1060-fcrop64=1,00005a57ffffa5a8-k-c0xffffffff-no-nd-rj"
+    alt="Banner de Ukoback"
+    loading="lazy"
+  >
 </div>
 
-<div class="video-card">
-<iframe loading="lazy"
-src="https://www.youtube.com/embed/pNmIgjnJ0eM">
-</iframe>
-</div>
-
-</div>
-
+<!-- BIO -->
+<section class="section bio" id="bio">
+  <div class="bio-inner">
+    <div class="bio-left reveal">
+      <div class="bio-photo-frame">
+        <img
+          src="https://i.postimg.cc/ZWXTPRL3/channels4-profile.jpg"
+          alt="Ukoback"
+          loading="lazy"
+        >
+      </div>
+    </div>
+    <div class="bio-right">
+      <span class="section-label reveal">Sobre mí</span>
+      <h2 class="section-title reveal">Mi espacio</h2>
+      <p class="reveal">
+        Soy <em>Ukoback</em>, creador de contenido, poeta y youtuber chileno.
+        Este sitio funciona como mi espacio digital donde puedes descubrir
+        mis videos y proyectos creativos.
+      </p>
+      <p class="reveal">
+        Hago contenido que mezcla <em>poesía, música y visuals</em>. Cada video
+        es una exploración nueva — sin límites de formato ni estilo.
+      </p>
+      <div class="bio-stats reveal-stagger">
+        <div>
+          <span class="stat-num">CL</span>
+          <span class="stat-label">Origen</span>
+        </div>
+        <div>
+          <span class="stat-num">YT</span>
+          <span class="stat-label">Plataforma</span>
+        </div>
+        <div>
+          <span class="stat-num">∞</span>
+          <span class="stat-label">Creatividad</span>
+        </div>
+      </div>
+    </div>
+  </div>
 </section>
 
-<section class="footer">
-© Ukoback — Sitio oficial
+<!-- VIDEOS -->
+<section class="section videos" id="videos">
+  <div class="videos-inner">
+    <span class="section-label reveal">Contenido</span>
+    <h2 class="section-title reveal">Videos destacados</h2>
+    <div class="video-grid reveal-stagger">
+
+      <div class="video-card">
+        <iframe
+          src="https://www.youtube.com/embed/-FeV22nsNhE?modestbranding=1&rel=0"
+          loading="lazy"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen
+          title="Video Ukoback 1"
+        ></iframe>
+        <div class="video-meta">
+          <span>Video destacado</span>
+        </div>
+      </div>
+
+      <div class="video-card">
+        <iframe
+          src="https://www.youtube.com/embed/pNmIgjnJ0eM?modestbranding=1&rel=0"
+          loading="lazy"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen
+          title="Video Ukoback 2"
+        ></iframe>
+        <div class="video-meta">
+          <span>Video destacado</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
 </section>
+
+<!-- LINKS -->
+<section class="links-section" id="links">
+  <div class="links-inner">
+    <span class="section-label reveal">Redes</span>
+    <h2 class="section-title reveal">Encuéntrame</h2>
+    <div class="links-grid reveal-stagger">
+
+      <a class="link-btn" href="https://www.youtube.com/@ukoback" target="_blank" rel="noopener">
+        <span>YouTube</span>
+        <svg class="link-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.19a3.02 3.02 0 0 0-2.13-2.14C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.37.55A3.02 3.02 0 0 0 .5 6.19C0 8.07 0 12 0 12s0 3.93.5 5.81a3.02 3.02 0 0 0 2.13 2.14C4.5 20.5 12 20.5 12 20.5s7.5 0 9.37-.55a3.02 3.02 0 0 0 2.13-2.14C24 15.93 24 12 24 12s0-3.93-.5-5.81zM9.75 15.5v-7l6.5 3.5-6.5 3.5z"/></svg>
+      </a>
+
+
+
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-line"></div>
+  <div class="footer-logo">UKOBACK</div>
+  <p class="footer-copy">© 2025 Ukoback — Sitio oficial · Todos los derechos reservados</p>
+  <div class="footer-line"></div>
+</footer>
 
 <script>
+// ── CURSOR ─────────────────────────────────────────────
+const cursor = document.getElementById('cursor');
+const ring = document.getElementById('cursorRing');
+let mx = 0, my = 0, rx = 0, ry = 0;
 
-function reveal(){
-const reveals=document.querySelectorAll(".reveal");
-
-reveals.forEach(el=>{
-const windowHeight=window.innerHeight;
-const elementTop=el.getBoundingClientRect().top;
-
-if(elementTop < windowHeight - 100){
-el.classList.add("active");
-}
+document.addEventListener('mousemove', e => {
+  mx = e.clientX; my = e.clientY;
+  cursor.style.left = mx + 'px';
+  cursor.style.top  = my + 'px';
 });
-}
 
-window.addEventListener("scroll", reveal);
+(function animateRing() {
+  rx += (mx - rx) * 0.12;
+  ry += (my - ry) * 0.12;
+  ring.style.left = rx + 'px';
+  ring.style.top  = ry + 'px';
+  requestAnimationFrame(animateRing);
+})();
 
+document.querySelectorAll('a, button, img').forEach(el => {
+  el.addEventListener('mouseenter', () => {
+    cursor.style.width = '16px';
+    cursor.style.height = '16px';
+  });
+  el.addEventListener('mouseleave', () => {
+    cursor.style.width = '10px';
+    cursor.style.height = '10px';
+  });
+});
+
+// ── SCROLL REVEAL ──────────────────────────────────────
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      // unobserve after first reveal for performance
+      observer.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
+
+document.querySelectorAll('.reveal, .reveal-stagger').forEach(el => observer.observe(el));
+
+// ── NAV SCROLL HIDE ────────────────────────────────────
+let lastY = 0;
+const nav = document.querySelector('nav');
+window.addEventListener('scroll', () => {
+  const y = window.scrollY;
+  if (y > 80) {
+    nav.style.background = 'rgba(10,8,6,0.95)';
+    nav.style.backdropFilter = 'blur(10px)';
+    nav.style.borderBottom = '1px solid rgba(201,168,76,0.08)';
+    nav.style.transition = 'background 0.4s, border-color 0.4s';
+  } else {
+    nav.style.background = '';
+    nav.style.backdropFilter = '';
+    nav.style.borderBottom = '';
+  }
+  lastY = y;
+}, { passive: true });
 </script>
 
 </body>
-</html>
-`;
+</html>`;
 
-return new Response(html,{
-headers:{
-"content-type":"text/html;charset=UTF-8",
-},
-});
-
-}
+    return new Response(html, {
+      headers: {
+        "content-type": "text/html;charset=UTF-8",
+        "cache-control": "public, max-age=3600",
+      },
+    });
+  },
 };
